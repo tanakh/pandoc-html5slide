@@ -1,0 +1,26 @@
+.slides.template-pfi > article:not(.nobackground):not(.biglogo) {
+    background: url(./pfi.jpg) 710px 625px no-repeat;
+    background-color: white;
+}
+
+.template-pfi h1 {
+    font-size: 50px;
+}
+
+.template-pfi h3 {
+    font-size: 45px;
+    line-height: 50px;
+    padding: 0;
+    margin: 0;
+    padding-right: 40px;
+    font-weight: 600;
+    letter-spacing: -1px;
+    color: rgb(51, 51, 51);
+}
+
+.template-pfi li::before {
+  width: 1em;
+  margin-left: -1em;
+
+  position: absolute;
+}
