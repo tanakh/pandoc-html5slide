@@ -6,6 +6,8 @@ import Control.Concurrent
 import Control.Exception
 import Data.List
 import Data.IORef
+import Data.Time.Clock
+import Data.Time.LocalTime
 import System.Environment
 import System.IO
 import Text.Blaze.Html5 as Html5
@@ -13,6 +15,7 @@ import Text.Blaze.Html5.Attributes as Attr
 import Text.Blaze.Renderer.String
 import Text.Pandoc
 import Text.Pandoc.Highlighting
+import Text.Printf
 import qualified Text.XHtml.Strict as XHtml
 
 writeHTML5SlideString :: WriterOptions -> Pandoc -> String
@@ -175,7 +178,10 @@ main = do
         writeFile outname $
           writeHTML5SlideString defaultWriterOptions doc
         writeIORef r strsrc
-        putStrLn "updated"
+        cur <- getCurrentTime
+        tz <- getCurrentTimeZone
+        let lt = utcToLocalTime tz cur
+        printf "[%s]: update\n" (show lt)
         hFlush stdout
     threadDelay $ 10^(6::Int)
 
