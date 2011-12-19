@@ -4,6 +4,8 @@
 import Control.Monad
 import Control.Concurrent
 import Control.Exception
+import Data.Data
+import Data.Generics
 import Data.List
 import Data.IORef
 import Data.Time.Clock
@@ -27,7 +29,7 @@ writeHTML5Slide opt (Pandoc Meta {..} blocks) = do
   html $ do
     Html5.head $ do
       Html5.title $ do
-        mapM_ renderInline docTitle
+        mapM_ renderInline $ everywhere (mkT $ replace "<br>" " ") docTitle
       Html5.meta ! charset "utf-8"
       script ! src "http://html5slides.googlecode.com/svn/trunk/slides.js" $ return ()
       link ! rel "stylesheet" ! href "syntax.css"
@@ -58,6 +60,12 @@ isSplitter _ = False
 
 sc :: String
 sc = "\"sourceCode\""
+
+replace :: String -> String -> String -> String
+replace _ _ "" = ""
+replace from to ss
+  | from `isPrefixOf` ss = to ++ drop (length from) ss
+  | otherwise = Prelude.head ss : replace from to (tail ss)
 
 noprettify :: String -> String
 noprettify "" = ""
