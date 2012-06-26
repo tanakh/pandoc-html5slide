@@ -140,7 +140,7 @@ renderBlock block = case block of
       Nothing ->
         error $ "cannot highlighter for: " ++ show attr
       Just html ->
-        html
+        [shamlet|<pre>#{html}|]
 
   RawBlock  format str ->
     -- TODO: use format
