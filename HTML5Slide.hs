@@ -12,9 +12,11 @@ import Data.Time.Clock
 import Data.Time.LocalTime
 import System.Environment
 import System.IO
+import Text.Blaze
+import Text.Blaze.Html
+import Text.Blaze.Html.Renderer.String
 import Text.Blaze.Html5 as Html5
 import Text.Blaze.Html5.Attributes as Attr
-import Text.Blaze.Renderer.String
 import Text.Pandoc
 import Text.Pandoc.Highlighting
 import Text.Printf
@@ -67,6 +69,7 @@ replace from to ss
   | from `isPrefixOf` ss = to ++ drop (length from) ss
   | otherwise = Prelude.head ss : replace from to (tail ss)
 
+{-
 noprettify :: String -> String
 noprettify "" = ""
 noprettify ss
@@ -75,6 +78,7 @@ noprettify ss
     noprettify (drop (length sc) ss)
   | otherwise =
       Prelude.head ss : noprettify (tail ss)
+-}
 
 renderBlock :: Block -> Html
 renderBlock block = case block of
@@ -82,11 +86,11 @@ renderBlock block = case block of
   Para      inls -> p $ mapM_ renderInline inls
   
   CodeBlock attr codestr -> do
-    case highlightHtml False attr codestr of
-      Left err -> error $ show err ++ ": " ++ show attr ++ ", " ++ codestr
-      Right htm -> preEscapedString $ noprettify $ XHtml.renderHtml htm
+    case highlight formatHtmlInline attr codestr of
+      Nothing -> error $ "code block error: " ++ codestr
+      Just htm -> htm -- preEscapedToMarkup $ {-noprettify $-} XHtml.renderHtml htm
   
-  RawBlock  format str -> preEscapedString str
+  RawBlock  format str -> preEscapedToMarkup str
   BlockQuote blocks -> blockquote $ mapM_ renderBlock blocks
   OrderedList attr bss -> do
     ol $ do
@@ -129,7 +133,7 @@ renderBlock block = case block of
 renderInline :: Inline -> Html
 renderInline inl = case inl of
   Str ss ->
-    string ss
+    toHtml ss
   Emph inls ->
     em $ mapM_ renderInline inls
   Strong inls ->
@@ -143,27 +147,23 @@ renderInline inl = case inl of
   SmallCaps inls ->
     small $ mapM_ renderInline inls
   Quoted SingleQuote inls -> do
-    string "'"
+    toHtml ("'" :: String)
     mapM_ renderInline inls
-    string "'"
+    toHtml ("'" :: String)
   Quoted DoubleQuote inls -> do
-    string "\""
+    toHtml ("\"" :: String)
     mapM_ renderInline inls
-    string "\""
+    toHtml ("\"" :: String)
   Cite cs inls -> do
     Html5.cite $ mapM_ renderInline inls
   Code ([], ["url"], []) code ->
-    string code
+    toHtml code
   Code attr code ->
     error $ show attr
-  Space -> preEscapedString "&nbsp;"
-  EmDash -> preEscapedString "&ndash;"
-  EnDash -> preEscapedString "&mdash;"
-  Apostrophe -> preEscapedString "&rsquo;"
-  Ellipses -> preEscapedString "&#133;"
+  Space -> preEscapedToMarkup ("&nbsp;" :: String)
   LineBreak -> br
   Math mathType str -> error "math"
-  RawInline "html" str -> preEscapedString str
+  RawInline "html" str -> preEscapedToMarkup str
   RawInline format str -> error ("rawinline: " ++ format)
   Link inls (url, title) -> do
     a ! href (toValue url) ! alt (toValue title) $
