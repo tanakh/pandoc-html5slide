@@ -31,7 +31,7 @@ $doctype 5
     <link rel="stylesheet" href="style.css">
 
   <body style="display: none">
-    <section.slides.layout-regular.template-pfi>
+    <section.slides.layout-regular.template-default>
       <article>
         <h1>#{renderInlines docTitle}
         <p>
@@ -50,31 +50,17 @@ sanitizeTitle = everywhere (mkT $ replace "<br>" " ")
 sectionize :: [Block] -> [[Block]]
 sectionize [] = []
 sectionize (b:bs) =
-  let (cs, ds) = Prelude.span (not . isSplitter) bs
+  let (cs, ds) = span (not . isSplitter) bs
   in (b:cs) : sectionize ds
-
-isSplitter (Header _ _) = True
-isSplitter _ = False
-
-sc :: String
-sc = "\"sourceCode\""
+  where
+    isSplitter (Header _ _) = True
+    isSplitter _ = False
 
 replace :: String -> String -> String -> String
 replace _ _ "" = ""
 replace from to ss
   | from `isPrefixOf` ss = to ++ drop (length from) ss
-  | otherwise = Prelude.head ss : replace from to (tail ss)
-
-{-
-noprettify :: String -> String
-noprettify "" = ""
-noprettify ss
-  | sc `isPrefixOf` ss =
-    "\"noprettyprint " ++ tail (take (length sc) ss) ++
-    noprettify (drop (length sc) ss)
-  | otherwise =
-      Prelude.head ss : noprettify (tail ss)
--}
+  | otherwise = head ss : replace from to (tail ss)
 
 renderBlocks :: [Block] -> Html
 renderBlocks = mapM_ renderBlock
@@ -88,8 +74,8 @@ renderBlock block = case block of
     case highlight formatHtmlInline attr codestr of
       Nothing ->
         error $ "cannot highlighter for: " ++ show attr
-      Just htm ->
-        htm
+      Just html ->
+        html
 
   RawBlock  format str ->
     -- TODO: use format
