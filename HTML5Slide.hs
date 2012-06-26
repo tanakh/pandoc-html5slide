@@ -31,9 +31,24 @@ instance Default HTML5SlideOptions where
     { slideClass = "template-default"
     , slideStyleCss  = ""
     , slideSyntaxCss = L.unpack $ renderCss $ [lucius|
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode, table.sourceCode pre
-   { margin: 0; padding: 0; border: 0; vertical-align: baseline; border: none; }
-td.lineNumbers { border-right: 1px solid #AAAAAA; text-align: right; color: #AAAAAA; padding-right: 5px; padding-left: 5px; }
+table.sourceCode,
+tr.sourceCode,
+td.lineNumbers,
+td.sourceCode,
+table.sourceCode pre {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  vertical-align: baseline;
+  border: none;
+}
+td.lineNumbers {
+  border-right: 1px solid #AAAAAA;
+  text-align: right;
+  color: #AAAAAA;
+  padding-right: 5px;
+  padding-left: 5px;
+}
 td.sourceCode { padding-left: 5px; }
 code.sourceCode span.kw { color: #007020; font-weight: bold; }
 code.sourceCode span.dt { color: #902000; }
