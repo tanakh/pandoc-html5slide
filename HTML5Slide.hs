@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE RecordWildCards, ViewPatterns #-}
 {-# LANGUAGE QuasiQuotes #-}
 
 module HTML5Slide (
@@ -83,13 +83,14 @@ $doctype 5
 
   <body style="display: none">
     <section.slides.layout-regular.#{slideClass}>
-      <article>
-        <h1>#{renderInlines docTitle}
-        <p>
-          $forall author <- docAuthors
-            #{renderInlines author}
-          <br>
-          #{renderInlines docDate}
+      $if not (null docTitle)
+        <article>
+          <h1>#{renderInlines docTitle}
+          <p>
+            $forall author <- docAuthors
+              #{renderInlines author}
+          <p>
+            #{renderInlines docDate}
 
       $forall sec <- sectionize blocks
         <article>#{renderBlocks sec}
@@ -100,12 +101,25 @@ sanitizeTitle = everywhere (mkT $ replace "<br>" " ")
 
 sectionize :: [Block] -> [[Block]]
 sectionize [] = []
-sectionize (b:bs) =
-  let (cs, ds) = span (not . isSplitter) bs
-  in (b:cs) : sectionize ds
+sectionize (b:bs)
+  | isArticleBegin b =
+    let (cs, d:ds) = span (not . isArticleEnd) bs
+    in (b:cs++[d]) : sectionize ds
+  | otherwise =
+    let (cs, ds) = span (not . isSplitter) bs
+    in (b:cs) : sectionize ds
   where
-    isSplitter (Header _ _) = True
-    isSplitter _ = False
+    isSplitter a = isHeader a || isArticleBegin a
+
+    isHeader (Header _ _) = True
+    isHeader _ = False
+
+    isArticleBegin (Plain [RawInline "html" raw])
+      | "<article" `isPrefixOf` raw = True
+    isArticleBegin _ = False
+
+    isArticleEnd (Plain [RawInline "html" "</article>"]) = True
+    isArticleEnd _ = False
 
 replace :: String -> String -> String -> String
 replace _ _ "" = ""
@@ -203,24 +217,23 @@ renderInline inl = case inl of
   Cite cs inls ->
     -- TODO: use cite info
     [shamlet|<cite>#{renderInlines inls}|]
-  Code ([], ["url"], []) code ->
-    -- TODO: accept inline code
-    [shamlet|#{code}|]
+  Code ("", [], []) code ->
+    [shamlet|<code>#{code}|]
   Code attr code ->
     -- TODO: implement
-    error $ show attr
+    error $ "unsupported inline code: " ++ show attr ++ ", " ++ code
   Space ->
-    [shamlet|&nbsp;|]
+    preEscapedToMarkup (" " :: String)
   LineBreak ->
     [shamlet|<br>|]
   Math mathType str ->
     -- TODO: support it
-    error "math"
+    error $ "unsupported math: " ++ show (mathType, str)
   RawInline "html" str ->
     preEscapedToMarkup str
   RawInline format str ->
     -- TODO: support it
-    error ("rawinline: " ++ format)
+    error $ "unsupported rawinline: " ++ format
   Link inls (url, title) ->
     [shamlet|<a href="#{url}" alt="#{title}">#{renderInlines inls}|]
   Image inls (url, title) -> do

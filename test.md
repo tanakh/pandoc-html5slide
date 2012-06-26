@@ -1,12 +1,29 @@
-% あいうえお
-% Pandoc太郎
-% 2012/06/26
+% Title Goes Here Up <br>To Two Lines
+% Sergey Brin
+% May 10, 2011
 
-# ほげ
+This is a slide with just text. This is a slide with just text.
+This is a slide with just text. This is a slide with just text.
+This is a slide with just text. This is a slide with just text.
 
-## もげ
+There is more text just underneath.
 
-# あいうえお
+## Simple slide with header and text
 
-## hoge-
+This is a slide with just text. This is a slide with just text.
+This is a slide with just text. This is a slide with just text.
+This is a slide with just text. This is a slide with just text.
 
+There is more text just underneath with a `code sample: 5px`.
+
+<article class="smaller">
+
+## Simple slide with header and text (small font)
+
+This is a slide with just text. This is a slide with just text.
+This is a slide with just text. This is a slide with just text.
+This is a slide with just text. This is a slide with just text.
+
+There is more text just underneath with a `code sample: 5px`.
+
+</article>
