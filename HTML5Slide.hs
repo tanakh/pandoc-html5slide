@@ -253,6 +253,11 @@ renderInline inl = case inl of
     [shamlet|<cite>#{renderInlines inls}|]
   Code ("", [], []) code ->
     [shamlet|<code>#{code}|]
+  Code ("", ["url"], []) code
+    | '@' `elem` code ->
+      [shamlet|<a href="mailto:#{code}">&lt;#{code}&gt;|]
+    | otherwise ->
+      [shamlet|<a href="#{code}">#{code}|]
   Code attr code ->
     -- TODO: implement
     error $ "unsupported inline code: " ++ show attr ++ ", " ++ code
