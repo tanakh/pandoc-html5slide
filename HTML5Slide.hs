@@ -152,12 +152,12 @@ renderBlock block = case block of
            #{renderBlocks d}|]
   Header level inls ->
     case level of
-      1 -> [shamlet|<h1>#{renderInlines inls}|]
-      2 -> [shamlet|<h2>#{renderInlines inls}|]
-      3 -> [shamlet|<h3>#{renderInlines inls}|]
-      4 -> [shamlet|<h4>#{renderInlines inls}|]
-      5 -> [shamlet|<h5>#{renderInlines inls}|]
-      6 -> [shamlet|<h6>#{renderInlines inls}|]
+      1 -> [shamlet|<h2>#{renderInlines inls}|]
+      2 -> [shamlet|<h3>#{renderInlines inls}|]
+      3 -> [shamlet|<h4>#{renderInlines inls}|]
+      4 -> [shamlet|<h5>#{renderInlines inls}|]
+      5 -> [shamlet|<h6>#{renderInlines inls}|]
+      6 -> [shamlet|<h7>#{renderInlines inls}|]
       _ -> error ("unsupported header level: " ++ show level)
   HorizontalRule ->
     [shamlet|hr|]
