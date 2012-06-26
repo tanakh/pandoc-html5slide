@@ -7,13 +7,10 @@ module HTML5Slide (
   writeHTML5SlideString,
   ) where
 
-import Control.Monad
 import Data.Generics
 import Data.List
 import Text.Blaze.Html
 import Text.Blaze.Html.Renderer.String
-import Text.Blaze.Html5 as Html5
-import Text.Blaze.Html5.Attributes as Attr
 import Text.Hamlet
 import Text.Pandoc
 import Text.Pandoc.Highlighting
@@ -44,9 +41,7 @@ $doctype 5
           #{renderInlines docDate}
 
       $forall sec <- sectionize blocks
-        <article>
-          $forall s <- sec
-            #{renderBlock s}
+        <article>#{renderBlocks sec}
 |]
 
 sanitizeTitle :: [Inline] -> [Inline]
@@ -81,53 +76,67 @@ noprettify ss
       Prelude.head ss : noprettify (tail ss)
 -}
 
+renderBlocks :: [Block] -> Html
+renderBlocks = mapM_ renderBlock
+
 renderBlock :: Block -> Html
 renderBlock block = case block of
-  Plain     inls -> mapM_ renderInline inls
-  Para      inls -> p $ mapM_ renderInline inls
+  Plain     inls -> renderInlines inls
+  Para      inls -> [shamlet|<p>#{renderInlines inls}|]
 
-  CodeBlock attr codestr -> do
+  CodeBlock attr codestr ->
     case highlight formatHtmlInline attr codestr of
-      Nothing -> error $ "code block error: " ++ codestr
-      Just htm -> htm -- preEscapedToMarkup $ {-noprettify $-} XHtml.renderHtml htm
+      Nothing ->
+        error $ "cannot highlighter for: " ++ show attr
+      Just htm ->
+        htm
 
-  RawBlock  format str -> preEscapedToMarkup str
-  BlockQuote blocks -> blockquote $ mapM_ renderBlock blocks
-  OrderedList attr bss -> do
-    ol $ do
-      forM_ bss $ \bs -> do
-        li $ mapM_ renderBlock bs
-  BulletList bss -> do
-    ul $ do
-      forM_ bss $ \bs -> do
-        li $ mapM_ renderBlock bs
-  DefinitionList defs -> do
-    dl $ do
-      forM_ defs $ \(t, ds) -> do
-        dd $ mapM_ renderInline t
-        forM_ ds $ \d ->
-          mapM_ renderBlock d
-  Header level inls -> do
-    let h = case level of
-          1 -> h1
-          2 -> h2
-          3 -> h3
-          4 -> h4
-          5 -> h5
-          6 -> h6
-          _ -> error ("header level: " ++ show level)
-    h $ mapM_ renderInline inls
-  HorizontalRule -> hr
-  Table cap colAlign colWidthRatio colHeader rows -> do
-    table $ do
-      caption $ mapM_ renderInline cap
-      thead $ tr $ do
-        forM_ colHeader $ \co -> td $ do
-          mapM_ renderBlock co
-      tbody $ do
-        forM_ rows $ \row -> tr $ do
-          forM_ row $ \co -> td $ do
-            mapM_ renderBlock co
+  RawBlock  format str ->
+    -- TODO: use format
+    preEscapedToMarkup str
+  BlockQuote blocks ->
+    [shamlet|<blockquote>#{renderBlocks blocks}|]
+  OrderedList attr bss ->
+    [shamlet|
+     <ol>
+       $forall bs <- bss
+         <li>#{renderBlocks bs}|]
+  BulletList bss ->
+    [shamlet|
+     <ul>
+       $forall bs <- bss
+         <li>#{renderBlocks bs}|]
+  DefinitionList defs ->
+    [shamlet|
+     <dl>
+       $forall (t, ds) <- defs
+         <dd>#{renderInlines t}
+         $forall d <- ds
+           #{renderBlocks d}|]
+  Header level inls ->
+    case level of
+      1 -> [shamlet|<h1>#{renderInlines inls}|]
+      2 -> [shamlet|<h2>#{renderInlines inls}|]
+      3 -> [shamlet|<h3>#{renderInlines inls}|]
+      4 -> [shamlet|<h4>#{renderInlines inls}|]
+      5 -> [shamlet|<h5>#{renderInlines inls}|]
+      6 -> [shamlet|<h6>#{renderInlines inls}|]
+      _ -> error ("unsupported header level: " ++ show level)
+  HorizontalRule ->
+    [shamlet|hr|]
+  Table cap colAlign colWidthRatio colHeader rows ->
+    [shamlet|
+     <table>
+       <caption>#{renderInlines cap}
+       <thead>
+         <tr>
+           $forall co <- colHeader
+             <td>#{renderBlocks co}
+       <tbody>
+         $forall row <- rows
+           <tr>
+             $forall co <- row
+               <td>#{renderBlocks co}|]
   Null ->
     return ()
 
