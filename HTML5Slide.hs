@@ -21,14 +21,16 @@ import Text.Pandoc.Highlighting
 
 data HTML5SlideOptions
   = HTML5SlideOptions
-    { slideClass     :: String
+    { slideScriptURL :: String
+    , slideClass     :: String
     , slideStyleCss  :: String
     , slideSyntaxCss :: String
     }
 
 instance Default HTML5SlideOptions where
   def = HTML5SlideOptions
-    { slideClass = "template-default"
+    { slideScriptURL = "http://html5slides.googlecode.com/svn/trunk/slides.js"
+    , slideClass = "template-default"
     , slideStyleCss  = ""
     , slideSyntaxCss = L.unpack $ renderCss $ [lucius|
 table.sourceCode,
@@ -77,7 +79,7 @@ $doctype 5
   <head>
     <title>#{renderInlines $ sanitizeTitle docTitle}
     <meta charset="utf-8">
-    <script src="http://html5slides.googlecode.com/svn/trunk/slides.js">
+    <script src="#{slideScriptURL}">
     <style>#{slideStyleCss}
     <style>#{slideSyntaxCss}
 
@@ -204,7 +206,7 @@ renderBlock block = case block of
       _ -> error ("unsupported header level: " ++ show level)
 
   HorizontalRule ->
-    [shamlet|hr|]
+    [shamlet|<hr>|]
 
   Table cap colAlign colWidthRatio colHeader rows ->
     [shamlet|
