@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards, ViewPatterns #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE QuasiQuotes #-}
 
 module HTML5Slide (
@@ -30,7 +30,7 @@ data HTML5SlideOptions
 instance Default HTML5SlideOptions where
   def = HTML5SlideOptions
     { slideScriptURL = "http://html5slides.googlecode.com/svn/trunk/slides.js"
-    , slideClass = "template-default"
+    , slideClass = ""
     , slideStyleCss  = ""
     , slideSyntaxCss = L.unpack $ renderCss $ [lucius|
 table.sourceCode,
