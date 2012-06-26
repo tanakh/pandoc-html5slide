@@ -2,17 +2,14 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE QuasiQuotes #-}
 
+module HTML5Slide (
+  writeHTML5Slide,
+  writeHTML5SlideString,
+  ) where
+
 import Control.Monad
-import Control.Concurrent
-import Control.Exception
 import Data.Generics
 import Data.List
-import Data.IORef
-import Data.Time.Clock
-import Data.Time.LocalTime
-import System.Environment
-import System.IO
--- import Text.Blaze
 import Text.Blaze.Html
 import Text.Blaze.Html.Renderer.String
 import Text.Blaze.Html5 as Html5
@@ -20,8 +17,6 @@ import Text.Blaze.Html5.Attributes as Attr
 -- import Text.Hamlet
 import Text.Pandoc
 import Text.Pandoc.Highlighting
-import Text.Printf
-import qualified Text.XHtml.Strict as XHtml
 
 writeHTML5SlideString :: WriterOptions -> Pandoc -> String
 writeHTML5SlideString opt pdoc = do
@@ -172,33 +167,3 @@ renderInline inl = case inl of
   Image inls (url, title) -> do
     img ! src (toValue url) ! alt (toValue title) ! class_ "centered"
   Note _ -> error "note not supported"
-
-main :: IO ()
-main = do
-  [filename] <- getArgs
-  let outname = (++".html") $ takeWhile (/='.') filename
-  r <- newIORef ""
-  forever $ do
-    try_  $ do
-      strsrc <- readFile filename
-      bef <- readIORef r
-      when (bef /= strsrc) $ do
-        let doc = readMarkdown defaultParserState { stateStandalone = True } strsrc
-        writeFile outname $
-          writeHTML5SlideString defaultWriterOptions doc
-        writeIORef r strsrc
-        cur <- getCurrentTime
-        tz <- getCurrentTimeZone
-        let lt = utcToLocalTime tz cur
-        printf "[%s]: update\n" (show lt)
-        hFlush stdout
-    threadDelay $ 10^(6::Int)
-
-try_ :: IO a -> IO ()
-try_ m = do
-  ret <- try m
-  case ret of
-    Left (SomeException e) -> do
-      print e
-    Right _ ->
-      return ()

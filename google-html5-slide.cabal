@@ -15,8 +15,8 @@ build-type:          Simple
 cabal-version:       >=1.8
 
 executable google-html5-slide
-  main-is:             HTML5Slide.hs
-  -- other-modules:       
+  main-is:             main.hs
+  other-modules:       HTML5Slide
   build-depends:       base       ==4.5.*
                      , syb        ==0.3.*
                      , time       >=1.4
