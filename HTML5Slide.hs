@@ -3,35 +3,71 @@
 {-# LANGUAGE QuasiQuotes #-}
 
 module HTML5Slide (
+  HTML5SlideOptions(..), def,
   writeHTML5Slide,
   writeHTML5SlideString,
   ) where
 
+import Data.Default
 import Data.Generics
 import Data.List
+import qualified Data.Text.Lazy as L
 import Text.Blaze.Html
 import Text.Blaze.Html.Renderer.String
 import Text.Hamlet
+import Text.Lucius
 import Text.Pandoc
 import Text.Pandoc.Highlighting
 
-writeHTML5SlideString :: WriterOptions -> Pandoc -> String
-writeHTML5SlideString opt pdoc = do
-  renderHtml $ writeHTML5Slide opt pdoc
+data HTML5SlideOptions
+  = HTML5SlideOptions
+    { slideClass     :: String
+    , slideStyleCss  :: String
+    , slideSyntaxCss :: String
+    }
 
-writeHTML5Slide :: WriterOptions -> Pandoc -> Html
-writeHTML5Slide _ (Pandoc Meta {..} blocks) = [shamlet|
+instance Default HTML5SlideOptions where
+  def = HTML5SlideOptions
+    { slideClass = "template-default"
+    , slideStyleCss  = ""
+    , slideSyntaxCss = L.unpack $ renderCss $ [lucius|
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode, table.sourceCode pre
+   { margin: 0; padding: 0; border: 0; vertical-align: baseline; border: none; }
+td.lineNumbers { border-right: 1px solid #AAAAAA; text-align: right; color: #AAAAAA; padding-right: 5px; padding-left: 5px; }
+td.sourceCode { padding-left: 5px; }
+code.sourceCode span.kw { color: #007020; font-weight: bold; }
+code.sourceCode span.dt { color: #902000; }
+code.sourceCode span.dv { color: #40a070; }
+code.sourceCode span.bn { color: #40a070; }
+code.sourceCode span.fl { color: #40a070; }
+code.sourceCode span.ch { color: #4070a0; }
+code.sourceCode span.st { color: #4070a0; }
+code.sourceCode span.co { color: #60a0b0; font-style: italic; }
+code.sourceCode span.ot { color: #007020; }
+code.sourceCode span.al { color: red; font-weight: bold; }
+code.sourceCode span.fu { color: #06287e; }
+code.sourceCode span.re { }
+code.sourceCode span.er { color: red; font-weight: bold; }
+|] undefined
+    }
+
+writeHTML5SlideString :: WriterOptions -> HTML5SlideOptions -> Pandoc -> String
+writeHTML5SlideString opt sopt pdoc = do
+  renderHtml $ writeHTML5Slide opt sopt pdoc
+
+writeHTML5Slide :: WriterOptions -> HTML5SlideOptions -> Pandoc -> Html
+writeHTML5Slide _ HTML5SlideOptions {..} (Pandoc Meta {..} blocks) = [shamlet|
 $doctype 5
 <html>
   <head>
     <title>#{renderInlines $ sanitizeTitle docTitle}
     <meta charset="utf-8">
     <script src="http://html5slides.googlecode.com/svn/trunk/slides.js">
-    <link rel="stylesheet" href="syntax.css">
-    <link rel="stylesheet" href="style.css">
+    <style>#{slideStyleCss}
+    <style>#{slideSyntaxCss}
 
   <body style="display: none">
-    <section.slides.layout-regular.template-default>
+    <section.slides.layout-regular.#{slideClass}>
       <article>
         <h1>#{renderInlines docTitle}
         <p>

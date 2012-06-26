@@ -20,10 +20,12 @@ source-repository head
 executable google-html5-slide
   main-is:             main.hs
   other-modules:       HTML5Slide
-  build-depends:       base       ==4.5.*
-                     , syb        ==0.3.*
-                     , time       >=1.4
-
-                     , blaze-html >=0.5
-                     , pandoc     >=1.9
-                     , hamlet     >=1.0
+  build-depends:       base            ==4.5.*
+                     , text            >=0.11
+                     , syb             ==0.3.*
+                     , time            >=1.4
+                     , data-default    >=0.5
+                     , blaze-html      >=0.5
+                     , pandoc          >=1.9
+                     , hamlet          >=1.0
+                     , shakespeare-css >=1.0

@@ -21,9 +21,11 @@ main = do
       strsrc <- readFile filename
       bef <- readIORef r
       when (bef /= strsrc) $ do
-        let doc = readMarkdown defaultParserState { stateStandalone = True } strsrc
+        let doc = readMarkdown
+                  defaultParserState { stateStandalone = True }
+                  strsrc
         writeFile outname $
-          writeHTML5SlideString defaultWriterOptions doc
+          writeHTML5SlideString defaultWriterOptions def doc
         writeIORef r strsrc
         cur <- getCurrentTime
         tz <- getCurrentTimeZone
