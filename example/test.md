@@ -16,17 +16,13 @@ This is a slide with just text. This is a slide with just text.
 
 There is more text just underneath with a `code sample: 5px`.
 
-<article class="smaller">
-
-## Simple slide with header and text (small font)
+### Simple slide with header and text (small font)
 
 This is a slide with just text. This is a slide with just text.
 This is a slide with just text. This is a slide with just text.
 This is a slide with just text. This is a slide with just text.
 
 There is more text just underneath with a `code sample: 5px`.
-
-</article>
 
 ## Slide with bullet points and a longer title,
    just because we can make it longer
@@ -52,9 +48,7 @@ It doesn't have to be a list.
 
 </div>
 
-<article class='smaller'>
-
-## Slide with bullet points (small font)
+### Slide with bullet points (small font)
 
 * Use this template to create your presentation
 * Use the provided color palette, box and arrow graphics,
@@ -63,8 +57,6 @@ It doesn't have to be a list.
   presentation template effectively
 * At all times strive to maintain Google's corporate look and feel
 
-</article>
-
 ## Slide with a table
 
 Name            Occupatoin
@@ -72,16 +64,12 @@ Name            Occupatoin
 Luke Mahé       V.P. of Keepin’ It Real
 Marcin Wichary  The Michael Bay of Doodles
 
-<article class='smaller'>
-
-## Slide with a table (smaller text)
+### Slide with a table (smaller text)
 
 Name            Occupatoin
 ------------    -------------------------
 Luke Mahé       V.P. of Keepin’ It Real
 Marcin Wichary  The Michael Bay of Doodles
-
-</article>
 
 ## Styles
 
@@ -142,9 +130,7 @@ Marcin Wichary  The Michael Bay of Doodles
 </style>
 ~~~
     
-<article class='smaller'>
-
-## This slide has some code (small font)
+### This slide has some code (small font)
 
 ~~~ {.javascript}
 <script type='text/javascript'>
@@ -163,7 +149,7 @@ Marcin Wichary  The Michael Bay of Doodles
 </style>
 ~~~
 
-</article>
+-----
 
 <q>
     The best way to predict the future is to invent it.
