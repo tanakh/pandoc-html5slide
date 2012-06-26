@@ -13,7 +13,8 @@ data HTML5Slide
     , argSlideClass     :: Maybe String
     , argSlideStyleCss  :: Maybe String
     , argSlideSyntaxCss :: Maybe String
-    , filename :: String
+    , argPoll           :: Bool
+    , filename          :: String
     }
   deriving (Show, Data, Typeable)
 
@@ -40,6 +41,10 @@ main = do
         &= explicit &= name "syntax-css"
         &= typFile
         &= help "Syntax CSS file"
+    , argPoll =
+        CA.def
+        &= explicit &= name "poll"
+        &= help "Poll filesystem for changes"
     , filename =
       CA.def
       &= argPos 0 &= typFile
@@ -60,7 +65,11 @@ main = do
             syntaxCss
         }
 
-  monitor filename $ \src -> do
-    writeFile outname
-      $ writeHTML5SlideString defaultWriterOptions slideOpt
-      $ readMarkdown defaultParserState { stateStandalone = True } src
+  let compile src =
+        writeFile outname
+        $ writeHTML5SlideString defaultWriterOptions slideOpt
+        $ readMarkdown defaultParserState { stateStandalone = True } src
+
+  if argPoll
+    then monitor  filename $ compile
+    else readFile filename >>= compile
