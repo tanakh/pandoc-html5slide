@@ -14,7 +14,7 @@ import Text.Blaze.Html
 import Text.Blaze.Html.Renderer.String
 import Text.Blaze.Html5 as Html5
 import Text.Blaze.Html5.Attributes as Attr
--- import Text.Hamlet
+import Text.Hamlet
 import Text.Pandoc
 import Text.Pandoc.Highlighting
 
@@ -23,29 +23,34 @@ writeHTML5SlideString opt pdoc = do
   renderHtml $ writeHTML5Slide opt pdoc
 
 writeHTML5Slide :: WriterOptions -> Pandoc -> Html
-writeHTML5Slide opt (Pandoc Meta {..} blocks) = do
-  html $ do
-    Html5.head $ do
-      Html5.title $ do
-        mapM_ renderInline $ everywhere (mkT $ replace "<br>" " ") docTitle
-      Html5.meta ! charset "utf-8"
-      script ! src "http://html5slides.googlecode.com/svn/trunk/slides.js" $ return ()
-      link ! rel "stylesheet" ! href "syntax.css"
-      link ! rel "stylesheet" ! href "style.css"
+writeHTML5Slide _ (Pandoc Meta {..} blocks) = [shamlet|
+$doctype 5
+<html>
+  <head>
+    <title>#{renderInlines $ sanitizeTitle docTitle}
+    <meta charset="utf-8">
+    <script src="http://html5slides.googlecode.com/svn/trunk/slides.js">
+    <link rel="stylesheet" href="syntax.css">
+    <link rel="stylesheet" href="style.css">
 
-    Html5.body ! Attr.style "display: none" $ do
-      section ! class_ "slides layout-regular template-pfi" $ do
-        article $ do
-          h1 $ mapM_ renderInline docTitle
-          p $ do
-            forM_ docAuthors $ \author ->
-              mapM_ renderInline author
-            br
-            mapM_ renderInline docDate
+  <body style="display: none">
+    <section.slides.layout-regular.template-pfi>
+      <article>
+        <h1>#{renderInlines docTitle}
+        <p>
+          $forall author <- docAuthors
+            #{renderInlines author}
+          <br>
+          #{renderInlines docDate}
 
-        forM_ (sectionize blocks) $ \sec -> do
-          article $ do
-            mapM_ renderBlock sec
+      $forall sec <- sectionize blocks
+        <article>
+          $forall s <- sec
+            #{renderBlock s}
+|]
+
+sanitizeTitle :: [Inline] -> [Inline]
+sanitizeTitle = everywhere (mkT $ replace "<br>" " ")
 
 sectionize :: [Block] -> [[Block]]
 sectionize [] = []
@@ -125,6 +130,9 @@ renderBlock block = case block of
             mapM_ renderBlock co
   Null ->
     return ()
+
+renderInlines :: [Inline] -> Html
+renderInlines = mapM_ renderInline
 
 renderInline :: Inline -> Html
 renderInline inl = case inl of

@@ -22,5 +22,5 @@ executable google-html5-slide
                      , time       >=1.4
                      , blaze-html >=0.5
                      , pandoc     >=1.9
---                     , hamlet     >=1.0
-                     , xhtml ==3000.2.*
+                     , hamlet     >=1.0
+--                     , xhtml ==3000.2.*
