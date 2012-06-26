@@ -1,10 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE QuasiQuotes #-}
 
 import Control.Monad
 import Control.Concurrent
 import Control.Exception
-import Data.Data
 import Data.Generics
 import Data.List
 import Data.IORef
@@ -12,11 +12,12 @@ import Data.Time.Clock
 import Data.Time.LocalTime
 import System.Environment
 import System.IO
-import Text.Blaze
+-- import Text.Blaze
 import Text.Blaze.Html
 import Text.Blaze.Html.Renderer.String
 import Text.Blaze.Html5 as Html5
 import Text.Blaze.Html5.Attributes as Attr
+-- import Text.Hamlet
 import Text.Pandoc
 import Text.Pandoc.Highlighting
 import Text.Printf
@@ -84,12 +85,12 @@ renderBlock :: Block -> Html
 renderBlock block = case block of
   Plain     inls -> mapM_ renderInline inls
   Para      inls -> p $ mapM_ renderInline inls
-  
+
   CodeBlock attr codestr -> do
     case highlight formatHtmlInline attr codestr of
       Nothing -> error $ "code block error: " ++ codestr
       Just htm -> htm -- preEscapedToMarkup $ {-noprettify $-} XHtml.renderHtml htm
-  
+
   RawBlock  format str -> preEscapedToMarkup str
   BlockQuote blocks -> blockquote $ mapM_ renderBlock blocks
   OrderedList attr bss -> do
