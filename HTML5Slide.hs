@@ -137,41 +137,48 @@ renderInlines = mapM_ renderInline
 renderInline :: Inline -> Html
 renderInline inl = case inl of
   Str ss ->
-    toHtml ss
+    [shamlet|#{ss}|]
   Emph inls ->
-    em $ mapM_ renderInline inls
+    [shamlet|<em>#{renderInlines inls}|]
   Strong inls ->
-    strong $ mapM_ renderInline inls
+    [shamlet|<strong>#{renderInlines inls}|]
   Strikeout inls ->
-    del $ mapM_ renderInline inls
+    [shamlet|<del>#{renderInlines inls}|]
   Superscript inls ->
-    sup $ mapM_ renderInline inls
+    [shamlet|<sup>#{renderInlines inls}|]
   Subscript inls ->
-    sub $ mapM_ renderInline inls
+    [shamlet|<sub>#{renderInlines inls}|]
   SmallCaps inls ->
-    small $ mapM_ renderInline inls
-  Quoted SingleQuote inls -> do
-    toHtml ("'" :: String)
-    mapM_ renderInline inls
-    toHtml ("'" :: String)
-  Quoted DoubleQuote inls -> do
-    toHtml ("\"" :: String)
-    mapM_ renderInline inls
-    toHtml ("\"" :: String)
-  Cite cs inls -> do
-    Html5.cite $ mapM_ renderInline inls
+    [shamlet|<small>#{renderInlines inls}|]
+  Quoted SingleQuote inls ->
+    [shamlet|'#{renderInlines inls}'|]
+  Quoted DoubleQuote inls ->
+    [shamlet|"#{renderInlines inls}"|]
+  Cite cs inls ->
+    -- TODO: use cite info
+    [shamlet|<cite>#{renderInlines inls}|]
   Code ([], ["url"], []) code ->
-    toHtml code
+    -- TODO: accept inline code
+    [shamlet|#{code}|]
   Code attr code ->
+    -- TODO: implement
     error $ show attr
-  Space -> preEscapedToMarkup ("&nbsp;" :: String)
-  LineBreak -> br
-  Math mathType str -> error "math"
-  RawInline "html" str -> preEscapedToMarkup str
-  RawInline format str -> error ("rawinline: " ++ format)
-  Link inls (url, title) -> do
-    a ! href (toValue url) ! alt (toValue title) $
-      mapM_ renderInline inls
+  Space ->
+    [shamlet|&nbsp;|]
+  LineBreak ->
+    [shamlet|<br>|]
+  Math mathType str ->
+    -- TODO: support it
+    error "math"
+  RawInline "html" str ->
+    preEscapedToMarkup str
+  RawInline format str ->
+    -- TODO: support it
+    error ("rawinline: " ++ format)
+  Link inls (url, title) ->
+    [shamlet|<a href="#{url}" alt="#{title}">#{renderInlines inls}|]
   Image inls (url, title) -> do
-    img ! src (toValue url) ! alt (toValue title) ! class_ "centered"
-  Note _ -> error "note not supported"
+    [shamlet|<img.centered src="#{url}" alt="#{title}">|]
+  Note _ ->
+    -- TODO: support it
+    error "note not supported"
