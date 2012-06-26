@@ -1,5 +1,0 @@
-#/bin/sh
-
-cabal update
-cabal install pandoc -fhighlighting --reinstall
-cabal install blaze-html xhtml time
