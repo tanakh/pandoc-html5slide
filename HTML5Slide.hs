@@ -105,6 +105,8 @@ sanitizeTitle = everywhere (mkT $ replace "<br>" " ")
 sectionize :: [Block] -> [[Block]]
 sectionize [] = []
 sectionize (b:bs)
+  | isHorizontalRule b =
+    sectionize bs
   | isArticleBegin b =
     let (cs, d:ds) = span (not . isArticleEnd) bs
     in (b:cs++[d]) : sectionize ds
@@ -112,7 +114,7 @@ sectionize (b:bs)
     let (cs, ds) = span (not . isSplitter) bs
     in (b:cs) : sectionize ds
   where
-    isSplitter a = isHeader a || isArticleBegin a
+    isSplitter a = isHeader a || isArticleBegin a || isHorizontalRule a
 
     isHeader (Header _ _) = True
     isHeader _ = False
@@ -123,6 +125,9 @@ sectionize (b:bs)
 
     isArticleEnd (Plain [RawInline "html" "</article>"]) = True
     isArticleEnd _ = False
+
+    isHorizontalRule HorizontalRule = True
+    isHorizontalRule _ = False
 
 isSmaller :: [Block] -> Bool
 isSmaller = (>0) . gcount (mkQ False f) where
