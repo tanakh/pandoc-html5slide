@@ -44,7 +44,6 @@ There is more text just underneath with a `code sample: 5px`.
 > - The list items fade in
 > - Last one!
 
-
 <div class="build">
 
 Any element with child nodes can build.
@@ -98,7 +97,7 @@ Marcin Wichary  The Michael Bay of Doodles
 
 ## Slide with an image
 
-<img style='height: 500px' src='images/example-graph.png'>
+<img style='height: 500px' src='http://html5slides.googlecode.com/svn/trunk/template/images/example-graph.png'>
 
 <div class='source'>
     Source: Sergey Brin
@@ -106,7 +105,7 @@ Marcin Wichary  The Michael Bay of Doodles
 
 ## Slide with an image (centered)
 
-<img class='centered' style='height: 500px' src='images/example-graph.png'>
+<img class='centered' style='height: 500px' src='http://html5slides.googlecode.com/svn/trunk/template/images/example-graph.png'>
 
 <div class='source'>
     Source: Larry Page
@@ -116,7 +115,7 @@ Marcin Wichary  The Michael Bay of Doodles
 
 ## Image filling the slide (with optional header)
 
-<img src='images/example-cat.jpg'>
+<img src='http://html5slides.googlecode.com/svn/trunk/template/images/example-cat.jpg'>
 
 <div class='source white'>
     Source: Eric Schmidt
