@@ -145,18 +145,35 @@ renderBlock block = case block of
   RawBlock  format str ->
     -- TODO: use format
     preEscapedToMarkup str
+
+  -- blockquoted lists are incremental list
+  BlockQuote [OrderedList attr bss] ->
+    [shamlet|
+     <ol.build>
+       $forall bs <- bss
+         <li>#{renderBlocks bs}|]
+
+  BlockQuote [BulletList bss] ->
+    [shamlet|
+     <ul.build>
+       $forall bs <- bss
+         <li>#{renderBlocks bs}|]
+
   BlockQuote blocks ->
     [shamlet|<blockquote>#{renderBlocks blocks}|]
+
   OrderedList attr bss ->
     [shamlet|
      <ol>
        $forall bs <- bss
          <li>#{renderBlocks bs}|]
+
   BulletList bss ->
     [shamlet|
      <ul>
        $forall bs <- bss
          <li>#{renderBlocks bs}|]
+
   DefinitionList defs ->
     [shamlet|
      <dl>
@@ -164,6 +181,7 @@ renderBlock block = case block of
          <dd>#{renderInlines t}
          $forall d <- ds
            #{renderBlocks d}|]
+
   Header level inls ->
     case level of
       1 -> [shamlet|<h2>#{renderInlines inls}|]
@@ -173,8 +191,10 @@ renderBlock block = case block of
       5 -> [shamlet|<h6>#{renderInlines inls}|]
       6 -> [shamlet|<h7>#{renderInlines inls}|]
       _ -> error ("unsupported header level: " ++ show level)
+
   HorizontalRule ->
     [shamlet|hr|]
+
   Table cap colAlign colWidthRatio colHeader rows ->
     [shamlet|
      <table>
@@ -188,6 +208,7 @@ renderBlock block = case block of
            <tr>
              $forall co <- row
                <td>#{renderBlocks co}|]
+
   Null ->
     return ()
 
